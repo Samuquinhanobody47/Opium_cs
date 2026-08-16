@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # ── Banco de Dados PostgreSQL ──
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: opium
+      POSTGRES_PASSWORD: opium_secret_123
+      POSTGRES_DB: opium
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # ── Aplicação Opium ──
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://opium:opium_secret_123@db:5432/opium?schema=public"
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "mude-esta-chave-para-uma-segura"
+      GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_SECRET: ""
+      PIX_API_KEY: ""
+      PIX_WEBHOOK_URL: ""
+      PIX_BASE_URL: ""
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+
+volumes:
+  pgdata:
